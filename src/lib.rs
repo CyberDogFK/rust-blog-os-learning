@@ -64,6 +64,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
 #[cfg(test)]
 #[no_mangle] // don't mange the name of this function
 pub extern "C" fn _start() -> ! {
+    init();
     test_main();
     loop {}
 }
