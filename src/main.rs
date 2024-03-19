@@ -8,6 +8,8 @@ extern crate alloc;
 
 use blog_os::memory::BootInfoFrameAllocator;
 use blog_os::println;
+use blog_os::task::executor::Executor;
+use blog_os::task::keyboard;
 use blog_os::task::{simple_executor::SimpleExecutor, Task};
 use bootloader::{entry_point, BootInfo};
 use core::panic::PanicInfo;
@@ -30,15 +32,16 @@ pub fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     allocator::init_heap(&mut mapper, &mut frame_allocator).expect("heap initialization failed");
 
-    let mut executor = SimpleExecutor::new();
+    let mut executor = Executor::new();
     executor.spawn(Task::new(example_task()));
+    executor.spawn(Task::new(keyboard::print_keypresses()));
     executor.run();
-
-    #[cfg(test)]
-    test_main();
-
-    println!("It did not crash!");
-    blog_os::hlt_loop();
+    //
+    // #[cfg(test)]
+    // test_main();
+    //
+    // println!("It did not crash!");
+    // blog_os::hlt_loop();
 }
 
 async fn async_number() -> u32 {
